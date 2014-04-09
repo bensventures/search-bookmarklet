@@ -6,9 +6,9 @@
 		getLink : function ( e )
 		{
 			var selectedUrl = e.currentTarget.getAttribute( 'data-url' ),
-				$input = $( '<input type="text" value="' + selectedUrl + '"/>' );
+				$input = jQuery( '<input type="text" value="' + selectedUrl + '"/>' );
 
-			$( e.currentTarget ).html( $input );
+			jQuery( e.currentTarget ).html( $input );
 			$input.select();
 		},
 
@@ -78,7 +78,7 @@
 		{
 			var self = this;
 
-			$( document.body ).append( searchProgramBookmarklet.template );
+			jQuery( document.body ).append( searchProgramBookmarklet.template );
 
 			self.populateSections();
 
