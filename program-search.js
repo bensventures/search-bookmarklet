@@ -70,8 +70,10 @@
 		{
 			var self = this;
 
-			$( document.body ).load( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.html', function ()
-			{
+			jQuery.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data ) {
+
+				$( document.body ).append( window.template );
+
 				self.populateSections();
 
 				jQuery( '#instance' ).change( function ( e )
@@ -86,8 +88,7 @@
 
 				jQuery( '#search_term' ).keyup( self.searchPrograms );
 				jQuery( '#platform_id' ).change( self.searchPrograms );
-			} );
-
+			});
 		}
 	}
 }() );
