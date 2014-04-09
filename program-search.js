@@ -1,7 +1,8 @@
 ( function ()
 {
-	window.searchProgramBookmarklet = {
+	var searchProgramBookmarklet = window.searchProgramBookmarklet || {};
 
+	searchProgramBookmarklet.app = {
 		getLink : function ( e )
 		{
 			var selectedUrl = e.currentTarget.getAttribute( 'data-url' ),
@@ -13,7 +14,7 @@
 
 		populateSections : function ( callback )
 		{
-			var urlSections = 'http://api.softonic.com/<instance>/sections.json?section_id=1&key=' + searchBookmarkletApiKey;
+			var urlSections = 'http://api.softonic.com/<instance>/sections.json?section_id=1&key=' + searchProgramBookmarklet.ApiKey;
 
 			urlSections = urlSections.replace( '<instance>', jQuery( '#instance' ).val() );
 
@@ -39,7 +40,7 @@
 
 			if ( search_term.length )
 			{
-				var urlSearch = 'http://api.softonic.com/<instance>/programs/search.json?query=<query>&platform_id=<platform_id>&key=' + searchBookmarkletApiKey;
+				var urlSearch = 'http://api.softonic.com/<instance>/programs/search.json?query=<query>&platform_id=<platform_id>&key=' + searchProgramBookmarklet.ApiKey;
 				urlSearch = urlSearch.replace( '<instance>', jQuery( '#instance' ).val() );
 				urlSearch = urlSearch.replace( '<platform_id>', jQuery( '#platform_id' ).val() );
 				urlSearch = urlSearch.replace( '<query>', search_term );
@@ -48,14 +49,21 @@
 				{
 					jQuery( '#search_results' ).html( '' );
 
-					jQuery.each( data._embedded.program, function ( index, program )
+					if( data._embedded )
 					{
+						jQuery.each( data._embedded.program, function ( index, program )
+						{
 
-						var url = 'http://' + program.download_url.replace( 'http://', '' ).split( '/' )[0];
+							var url = 'http://' + program.download_url.replace( 'http://', '' ).split( '/' )[0];
 
-						jQuery( '#search_results' ).append( '<li data-url="' + url + '"><img width="20px" class="thumb" src="' + program.thumbnail + '"/>' + program.title + ' - ' + program.version + '</li>' )
+							jQuery( '#search_results' ).append( '<li class="program-item" data-url="' + url + '"><img width="20px" class="thumb" src="' + program.thumbnail + '"/>' + program.title + ' - ' + program.version + '</li>' )
 
-					} )
+						} )
+					}
+					else
+					{
+						jQuery( '#search_results' ).append( '<li>No results</li>' );
+					}
 				} );
 			}
 			else
@@ -82,7 +90,7 @@
 				} );
 			} );
 
-			jQuery( '#search_results' ).delegate( 'li', 'click', self.getLink );
+			jQuery( '#search_results' ).delegate( 'li.program-item', 'click', self.getLink );
 
 			jQuery( '#search_term' ).keyup( self.searchPrograms );
 			jQuery( '#platform_id' ).change( self.searchPrograms );
