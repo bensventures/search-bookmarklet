@@ -54,9 +54,7 @@
 						jQuery.each( data._embedded.program, function ( index, program )
 						{
 
-							var url = 'http://' + program.download_url.replace( 'http://', '' ).split( '/' )[0];
-
-							jQuery( '#search_results' ).append( '<li class="program-item" data-url="' + url + '"><img width="20px" class="thumb" src="' + program.thumbnail + '"/>' + program.title + ' - ' + program.version + '</li>' )
+							jQuery( '#search_results' ).append( '<li class="program-item" data-url="' + program.url + '"><img width="20px" class="thumb" src="' + program.thumbnail + '"/>' + program.title + ' - ' + program.version + '</li>' )
 
 						} )
 					}
