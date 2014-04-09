@@ -66,29 +66,43 @@
 			return false;
 		},
 
+		build : function ()
+		{
+			var self = this;
+
+			$( document.body ).append( window.template );
+
+			self.populateSections();
+
+			jQuery( '#instance' ).change( function ( e )
+			{
+				self.populateSections( function ()
+				{
+					self.searchPrograms( e );
+				} );
+			} );
+
+			jQuery( '#search_results' ).delegate( 'li', 'click', self.getLink );
+
+			jQuery( '#search_term' ).keyup( self.searchPrograms );
+			jQuery( '#platform_id' ).change( self.searchPrograms );
+		},
+
 		startBookmarklet : function ()
 		{
 			var self = this;
 
-			jQuery.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data ) {
-
-				$( document.body ).append( window.template );
-
-				self.populateSections();
-
-				jQuery( '#instance' ).change( function ( e )
+			if ( !searchProgramBookmarklet.template )
+			{
+				jQuery.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data )
 				{
-					self.populateSections( function ()
-					{
-						self.searchPrograms( e );
-					} );
+					self.build();
 				} );
-
-				jQuery( '#search_results' ).delegate( 'li', 'click', self.getLink );
-
-				jQuery( '#search_term' ).keyup( self.searchPrograms );
-				jQuery( '#platform_id' ).change( self.searchPrograms );
-			});
+			}
+			else
+			{
+				self.build();
+			}
 		}
 	}
 }() );
