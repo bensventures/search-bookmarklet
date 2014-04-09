@@ -70,7 +70,7 @@
 		{
 			var self = this;
 
-			$( document.body ).append( window.template );
+			$( document.body ).append( searchProgramBookmarklet.template );
 
 			self.populateSections();
 
