@@ -70,7 +70,7 @@
 		{
 			var self = this;
 
-			$( document.body ).load( 'template.html', function ()
+			$( document.body ).load( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.html', function ()
 			{
 				self.populateSections();
 
