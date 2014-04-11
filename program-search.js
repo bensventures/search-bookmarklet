@@ -145,8 +145,7 @@
 
 			if ( !searchProgramBookmarklet.template )
 			{
-				//jQuery.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data )
-				jQuery.getScript( 'template.js', function ( data )
+				jQuery.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data )
 				{
 					self.build();
 				} );
