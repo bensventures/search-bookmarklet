@@ -25,7 +25,8 @@
 
 		populateSections : function ( callback )
 		{
-			var urlSections = 'http://api.softonic.com/<instance>/sections.json?section_id=1&key=' + searchProgramBookmarklet.ApiKey;
+			var urlSections = 'http://api.softonic.com/<instance>/sections.json?section_id=1&key=' + searchProgramBookmarklet.ApiKey,
+				savedPlatform = localStorage.getItem( 'psb_platform_id' );
 
 			urlSections = urlSections.replace( '<instance>', jQuery( '#psb_instance' ).val() );
 
@@ -37,6 +38,11 @@
 				{
 					$psb_platform_id.append( '<option value="' + platform.section_id + '">' + platform.short_name + '</option>' );
 				} );
+
+				if ( savedPlatform )
+				{
+					$psb_platform_id.val( savedPlatform );
+				}
 
 				if ( callback )
 				{
@@ -120,7 +126,10 @@
 				}, 300 );
 			} );
 
-			$psb_platform_id.change( self.searchPrograms );
+			$psb_platform_id.change( function (){
+				localStorage.setItem( 'psb_platform_id', this.value );
+				self.searchPrograms()
+			});
 
 			jQuery( '#psb form' ).submit( function (){
 				return false;
