@@ -10,7 +10,7 @@ searchProgramBookmarklet.template = '' +
 			'#psb li { list-style: none; margin-bottom: .5em; padding: .5em; overflow: hidden; cursor:pointer; } ' +
 			'#psb li img { vertical-align: middle } #psb li input { width: 100% } ' +
 			'#psb-icon-search{ background:#1A86D6;float:left;width:40px;height:45px;margin-left:-40px;padding-top:5px }' +
-			'#psb-icon-search span{ position: relative;display: block;float: left;margin: .625em;width: .75em;height: .75em;background: #1A86D6;border: .25em solid #fff; margin-left: .938em; border-radius:.625em; }' +
+			'#psb-icon-search span{-moz-box-sizing: content-box; position: relative;display: block;float: left;margin: .625em;width: .75em;height: .75em;background: #1A86D6;border: .25em solid #fff; margin-left: .938em; border-radius:.625em; }' +
 			'#psb-icon-search span:before{ content: "";position: absolute;width: .25em;  height: .875em;  margin: .5em 0 0 -.375em;  background: #fff; transform: rotate(45deg); }' +
 		'</style>' +
 		'<span id="psb-icon-search"><span></span></span>' +
