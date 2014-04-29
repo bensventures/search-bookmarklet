@@ -5,13 +5,54 @@
 		$psb_platform_id;
 
 	searchProgramBookmarklet.app = {
-		getLink : function ( e )
+
+		toggleLink : function ()
 		{
 			$psb_search_results.find( 'input' ).hide();
-			$psb_search_results.find( 'span' ).show();
+			$psb_search_results.find( '.toggleLink' ).show();
 
-			jQuery( e.currentTarget ).find( 'span' ).hide();
-			jQuery( e.currentTarget ).find( 'input' ).show().select();
+			$( this ).prev().toggle().select();
+			$( this ).toggle();
+		},
+
+		getProgramInfo : function ()
+		{
+			var articleSearch = 'http://api.softonic.com/<instance>/programs/<program_id>/articles.json?key=' + searchProgramBookmarklet.ApiKey,
+				parentItem = this.parentNode.parentNode.parentNode,
+				$editorial = $( parentItem ).find( '.result-editorial' ),
+				$editorialResults = $editorial.find( 'ul' );
+
+			articleSearch = articleSearch.replace( '<instance>', jQuery( '#psb_instance' ).val() );
+			articleSearch = articleSearch.replace( '<program_id>', parentItem.getAttribute( 'data-program-id' ) );
+
+			if( !$editorial.is( ':visible' ) )
+			{
+				jQuery.get( articleSearch, function ( data )
+				{
+					if ( data.count > 0 )
+					{
+						jQuery.each( data._embedded.article, function ( index, article )
+						{
+							$editorialResults.append( '<li class="article-item">' +
+															'<input type="text" readonly value="'+ article.url +'"/>' +
+															'<span class="toggleLink">' + article.title + '</span>' +
+															'<div class="buttons editorial-buttons"><span class="get-link"></span></div>' +
+														'</li>' )
+						} );
+					}
+					else
+					{
+						$editorialResults.append( '<li class="article-item">No related articles</li>' );
+					}
+
+					$editorial.show();
+				} );
+			}
+			else
+			{
+				$editorial.hide();
+				$editorialResults.html( '' );
+			}
 		},
 
 		selectInstance : function () {
@@ -23,6 +64,10 @@
 			}
 		},
 
+		/**
+		 * Create the options in the select for categories
+		 * @param callback
+		 */
 		populateSections : function ( callback )
 		{
 			var urlSections = 'http://api.softonic.com/<instance>/sections.json?section_id=1&key=' + searchProgramBookmarklet.ApiKey,
@@ -51,6 +96,10 @@
 			} );
 		},
 
+		/**
+		 * Start the search of a program through the API
+		 * @returns {boolean}
+		 */
 		searchPrograms : function ()
 		{
 			var search_term = jQuery( '#psb_search_term' ).val();
@@ -71,8 +120,18 @@
 						jQuery.each( data._embedded.program, function ( index, program )
 						{
 
-							$psb_search_results.append( '<li class="program-item"><img width="20px" class="thumb" src="' + program.thumbnail + '"/><input type="text" readonly value="'+ program.url +'"/><span>' + program.title + ' - ' + program.version + '</span></li>' )
-
+							$psb_search_results.append( '<li class="program-item" data-program-id="'+ program.program_id +'">' +
+															'<div>' +
+																'<img width="35px" class="thumb" src="' + program.thumbnail + '"/>' +
+																'<input type="text" readonly value="'+ program.url +'"/>' +
+																'<span class="toggleLink">' + program.title + ' - ' + program.version + '</span>' +
+																'<div class="buttons"><span class="get-link"></span><span class="handle">+</span></div>' +
+															'</div>' +
+															'<div class="result-editorial" >' +
+																'<h4>Related articles</h4>' +
+																'<ul></ul>' +
+															'</div>' +
+														'</li>' )
 						} )
 					}
 					else
@@ -89,22 +148,29 @@
 			return false;
 		},
 
-		build : function ()
+		/**
+		 * Add all the event on the dom elements
+		 */
+		attachEvents : function ()
 		{
 			var self = this,
 				timeOutRef,
 				timeOutHide;
 
-			jQuery( document.body ).append( searchProgramBookmarklet.template );
+			$psb_search_results.delegate( 'li.program-item .handle', 'click', self.getProgramInfo );
+			$psb_search_results.delegate( '.toggleLink', 'click', self.toggleLink );
+			// make it look like we are calling from the togglelink element
+			$psb_search_results.delegate( '.get-link', 'click', function ()
+			{
+				self.toggleLink.call( $( this.parentNode.parentNode ).find( '.toggleLink' )[0] );
+			} );
 
-			$psb_search_results = jQuery( '#psb_search_results' );
-			$psb_platform_id = jQuery( '#psb_platform_id' );
+			$psb_platform_id.change( function (){
+				localStorage.setItem( 'psb_platform_id', this.value );
+				self.searchPrograms()
+			});
 
-			self.selectInstance();
-
-			self.populateSections();
-
-			jQuery( '#psb_instance' ).change( function ( e )
+			jQuery( '#psb_instance' ).change( function ()
 			{
 				localStorage.setItem( 'psb_instance_id', this.value );
 
@@ -114,9 +180,7 @@
 				} );
 			} );
 
-			$psb_search_results.delegate( 'li.program-item', 'click', self.getLink );
-
-			jQuery( '#psb_search_term' ).keyup( function ( e )
+			jQuery( '#psb_search_term' ).keyup( function ()
 			{
 				// don't hammer the api
 				clearTimeout( timeOutRef );
@@ -126,15 +190,11 @@
 				}, 300 );
 			} );
 
-			$psb_platform_id.change( function (){
-				localStorage.setItem( 'psb_platform_id', this.value );
-				self.searchPrograms()
-			});
-
 			jQuery( '#psb form' ).submit( function (){
 				return false;
 			} );
 
+			// Show / Hide the container
 			jQuery( '#psb' ).hover( function ( e ){
 				//mouse in
 				clearTimeout( timeOutHide );
@@ -146,6 +206,20 @@
 					jQuery( '#psb' ).animate( { right :  -( jQuery( '#psb' ).width() ) } );
 				}, 1000 );
 			} );
+		},
+
+		build : function ()
+		{
+			jQuery( document.body ).append( searchProgramBookmarklet.template );
+
+			$psb_search_results = jQuery( '#psb_search_results' );
+			$psb_platform_id = jQuery( '#psb_platform_id' );
+
+			this.selectInstance();
+
+			this.populateSections();
+
+			this.attachEvents();
 		},
 
 		startBookmarklet : function ()
