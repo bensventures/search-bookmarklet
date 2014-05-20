@@ -1,4 +1,4 @@
-( function ()
+( function ( $ )
 {
 	var searchProgramBookmarklet = window.searchProgramBookmarklet || {},
 		$psb_search_results,
@@ -22,16 +22,16 @@
 				$editorial = $( parentItem ).find( '.result-editorial' ),
 				$editorialResults = $editorial.find( 'ul' );
 
-			articleSearch = articleSearch.replace( '<instance>', jQuery( '#psb_instance' ).val() );
+			articleSearch = articleSearch.replace( '<instance>', $( '#psb_instance' ).val() );
 			articleSearch = articleSearch.replace( '<program_id>', parentItem.getAttribute( 'data-program-id' ) );
 
 			if( !$editorial.is( ':visible' ) )
 			{
-				jQuery.get( articleSearch, function ( data )
+				$.get( articleSearch, function ( data )
 				{
 					if ( data.count > 0 )
 					{
-						jQuery.each( data._embedded.article, function ( index, article )
+						$.each( data._embedded.article, function ( index, article )
 						{
 							$editorialResults.append( '<li class="article-item">' +
 															'<input type="text" readonly value="'+ article.url +'"/>' +
@@ -60,7 +60,7 @@
 
 			if ( savedInstance )
 			{
-				jQuery( '#psb_instance' ).val( savedInstance );
+				$( '#psb_instance' ).val( savedInstance );
 			}
 		},
 
@@ -73,13 +73,13 @@
 			var urlSections = 'http://api.softonic.com/<instance>/sections.json?section_id=1&key=' + searchProgramBookmarklet.ApiKey,
 				savedPlatform = localStorage.getItem( 'psb_platform_id' );
 
-			urlSections = urlSections.replace( '<instance>', jQuery( '#psb_instance' ).val() );
+			urlSections = urlSections.replace( '<instance>', $( '#psb_instance' ).val() );
 
 			$psb_platform_id.html( '' );
 
-			jQuery.get( urlSections, function ( data )
+			$.get( urlSections, function ( data )
 			{
-				jQuery.each( data._embedded.section, function ( index, platform )
+				$.each( data._embedded.section, function ( index, platform )
 				{
 					$psb_platform_id.append( '<option value="' + platform.section_id + '">' + platform.short_name + '</option>' );
 				} );
@@ -102,22 +102,22 @@
 		 */
 		searchPrograms : function ()
 		{
-			var search_term = jQuery( '#psb_search_term' ).val();
+			var search_term = $( '#psb_search_term' ).val();
 
 			if ( search_term.length )
 			{
 				var urlSearch = 'http://api.softonic.com/<instance>/programs/search.json?query=<query>&platform_id=<platform_id>&key=' + searchProgramBookmarklet.ApiKey;
-				urlSearch = urlSearch.replace( '<instance>', jQuery( '#psb_instance' ).val() );
+				urlSearch = urlSearch.replace( '<instance>', $( '#psb_instance' ).val() );
 				urlSearch = urlSearch.replace( '<platform_id>', $psb_platform_id.val() );
 				urlSearch = urlSearch.replace( '<query>', search_term );
 
-				jQuery.get( urlSearch, function ( data )
+				$.get( urlSearch, function ( data )
 				{
 					$psb_search_results.html( '' );
 
 					if ( data._embedded )
 					{
-						jQuery.each( data._embedded.program, function ( index, program )
+						$.each( data._embedded.program, function ( index, program )
 						{
 
 							$psb_search_results.append( '<li class="program-item" data-program-id="'+ program.program_id +'">' +
@@ -170,7 +170,7 @@
 				self.searchPrograms()
 			});
 
-			jQuery( '#psb_instance' ).change( function ()
+			$( '#psb_instance' ).change( function ()
 			{
 				localStorage.setItem( 'psb_instance_id', this.value );
 
@@ -180,7 +180,7 @@
 				} );
 			} );
 
-			jQuery( '#psb_search_term' ).keyup( function ()
+			$( '#psb_search_term' ).keyup( function ()
 			{
 				// don't hammer the api
 				clearTimeout( timeOutRef );
@@ -190,30 +190,30 @@
 				}, 300 );
 			} );
 
-			jQuery( '#psb form' ).submit( function (){
+			$( '#psb form' ).submit( function (){
 				return false;
 			} );
 
 			// Show / Hide the container
-			jQuery( '#psb' ).hover( function ( e ){
+			$( '#psb' ).hover( function ( e ){
 				//mouse in
 				clearTimeout( timeOutHide );
 
-				jQuery( '#psb' ).css( 'right', '0' );
+				$( '#psb' ).css( 'right', '0' );
 			}, function (){
 				//mouse out
 				timeOutHide = setTimeout( function (){
-					jQuery( '#psb' ).animate( { right :  -( jQuery( '#psb' ).width() ) } );
+					$( '#psb' ).animate( { right :  -( $( '#psb' ).width() ) } );
 				}, 1000 );
 			} );
 		},
 
 		build : function ()
 		{
-			jQuery( document.body ).append( searchProgramBookmarklet.template );
+			$( document.body ).append( searchProgramBookmarklet.template );
 
-			$psb_search_results = jQuery( '#psb_search_results' );
-			$psb_platform_id = jQuery( '#psb_platform_id' );
+			$psb_search_results = $( '#psb_search_results' );
+			$psb_platform_id = $( '#psb_platform_id' );
 
 			this.selectInstance();
 
@@ -228,7 +228,7 @@
 
 			if ( !searchProgramBookmarklet.template )
 			{
-				jQuery.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data )
+				$.getScript( 'https://raw.githubusercontent.com/bensventures/search-bookmarklet/master/template.js', function ( data )
 				{
 					self.build();
 				} );
@@ -239,4 +239,4 @@
 			}
 		}
 	}
-}() );
+}( jQuery ) );
